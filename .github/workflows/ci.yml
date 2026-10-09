@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy app
+
+  test:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    env:
+      # CI never talks to Qloo or an LLM: every test uses the mock transport,
+      # respx-mocked HTTP, or the scripted model.
+      QLOO_MOCK: "1"
+      LLM_MOCK: "1"
+      PREWARM: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+
+  docker:
+    name: Docker build and health probe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t roadie:ci .
+      - name: Run in mock mode and probe
+        run: |
+          docker run -d --name roadie -p 8000:8000 -e QLOO_MOCK=1 -e LLM_MOCK=1 roadie:ci
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8000/health && break
+            sleep 1
+          done
+          curl -fsS -X POST http://127.0.0.1:8000/api/plan \
+            -H 'Content-Type: application/json' \
+            -d '{"artists":["Phoebe Bridgers"],"home_region":"Pacific Northwest","tour_days":8,"budget_usd":5000}' \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['grounded']['route']['stops'], d"
+      - if: always()
+        run: docker logs roadie || true
+
+  mutation:
+    name: Mutation score (testteeth, non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]" "testteeth>=0.2,<0.3"
+      - run: make mutation-ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-report
+          path: mutation.json

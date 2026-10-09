@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+mutation.json
+mutants/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Qloo response data must never be committed (hackathon terms)
+.cache/
+qloo_cache/
+*.qloo.json
+recordings/
+
+# Research scratch fetched from docs.qloo.com (not ours to redistribute)
+src/
+
+# Private research notes (strategy; keep out of the public repo)
+RESEARCH.md

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roadie: tour routing grounded in taste data</title>
+  <meta name="description" content="Roadie routes independent musicians' tours to the cities, rooms and openers where their audience actually is, using Qloo taste data." />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◐</span>
+      <div>
+        <h1>Roadie</h1>
+        <p class="tag">Route your tour to where your audience already is.</p>
+      </div>
+    </div>
+    <div id="modes" class="modes" aria-live="polite"></div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel" aria-labelledby="plan-h">
+      <h2 id="plan-h">Plan a run</h2>
+      <div id="presets" class="presets" aria-label="Demo presets"></div>
+      <form id="plan-form" novalidate>
+        <label>Artist or reference artists
+          <input name="artists" required placeholder="e.g. Phoebe Bridgers, Big Thief" />
+          <small>Up to 5, comma-separated. Use acts your audience also loves.</small>
+        </label>
+        <label>Home region
+          <input name="home_region" list="regions" required placeholder="Pacific Northwest" />
+          <datalist id="regions"></datalist>
+          <small>Pick a region or enter "lat,lon".</small>
+        </label>
+        <div class="row">
+          <label>Tour days <input name="tour_days" type="number" min="2" max="45" value="10" /></label>
+          <label>Budget (USD) <input name="budget_usd" type="number" min="100" step="100" value="6000" /></label>
+          <label>Band size <input name="band_size" type="number" min="1" max="12" value="3" /></label>
+        </div>
+        <label>Start date <input name="start_date" type="date" /></label>
+        <label>Opener shortlist (optional)
+          <input name="local_openers" placeholder="Local acts you already know, comma-separated" />
+          <small>Roadie scores them against your audience with Qloo.</small>
+        </label>
+        <label class="check"><input type="checkbox" name="include_baseline" checked /> Compare with an LLM-only plan</label>
+        <button type="submit" id="go">Route my tour</button>
+        <p id="status" class="status" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel map-panel" aria-label="Map">
+      <div id="map"></div>
+      <div class="legend">
+        <span><i class="sw grounded"></i>Qloo-grounded route</span>
+        <span><i class="sw baseline"></i>LLM-only route</span>
+        <span><i class="sw heat"></i>Audience hotspots</span>
+        <span><i class="sw cand"></i>Other candidate cities</span>
+      </div>
+    </section>
+
+    <section id="results" class="results" hidden>
+      <div class="panel">
+        <div class="head-row">
+          <h2>Itinerary</h2>
+          <a id="trace" class="trace" target="_blank" rel="noopener" hidden>View agent trace in LangSmith ↗</a>
+        </div>
+        <p id="summary" class="summary"></p>
+        <div id="money" class="money"></div>
+        <ol id="stops" class="stops"></ol>
+        <details class="days"><summary>Day-by-day</summary><table id="days"></table></details>
+        <ul id="risks" class="risks"></ul>
+      </div>
+
+      <div class="panel">
+        <h2>LLM-only vs Qloo-grounded</h2>
+        <p class="muted">Same model, same request. The left plan had no tools; Roadie then checked it against Qloo.</p>
+        <div id="compare" class="compare"></div>
+      </div>
+
+      <div class="panel">
+        <h2>How the agent got here</h2>
+        <p class="muted">Every tool call and the Qloo requests behind it (API key never shown).</p>
+        <ol id="steps" class="steps"></ol>
+        <ul id="warnings" class="warnings"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Roadie · MIT · Taste data by <a href="https://www.qloo.com" target="_blank" rel="noopener">Qloo</a> · Map © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</span>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
