@@ -176,7 +176,7 @@ free tiers that sleep.
 
 ## Tests and CI
 
-- 120 pytest tests, all offline: the Qloo client is tested against
+- 121 pytest tests, all offline: the Qloo client is tested against
   `respx`-mocked HTTP (base URL, `X-Api-Key` header, GET-only, comma-joined
   lists, legacy-path refusal, 401/403/400 handling, 429/5xx retry, caching,
   `/v2/analysis/compare` path), the mock transport against the documented
