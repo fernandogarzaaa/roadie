@@ -86,6 +86,7 @@ def test_prewarm_runs(monkeypatch):
 
 
 def test_settings_from_env(monkeypatch):
+    monkeypatch.delenv("QLOO_MOCK", raising=False)
     monkeypatch.setenv("QLOO_API_KEY", "q")
     monkeypatch.setenv("QLOO_BASE_URL", "https://hackathon.api.qloo.com/")
     monkeypatch.setenv("LLM_API_KEY", "l")
