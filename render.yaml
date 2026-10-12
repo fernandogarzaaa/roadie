@@ -8,6 +8,11 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
+      # Render's edge proxy is the only route to the container, so trusting
+      # its X-Forwarded-For is safe here. Do not copy this to a host where
+      # the port is directly reachable.
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
       - key: QLOO_API_KEY
         sync: false
       - key: QLOO_BASE_URL
