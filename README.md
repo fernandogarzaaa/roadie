@@ -137,6 +137,7 @@ make run
 | `LANGSMITH_PROJECT` | `roadie` | |
 | `LANGSMITH_ENDPOINT` | SDK default | e.g. the EU endpoint. |
 | `RATE_LIMIT_PER_10MIN` | `12` | Per-IP plan limit, protects your keys on a public demo. |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1` | Addresses whose `X-Forwarded-For` uvicorn trusts (the rate limiter keys on the client IP). Behind Railway/Render, where the container is only reachable through the platform proxy, set `*` (render.yaml already does); never set `*` when the port is directly reachable. |
 | `PREWARM` | `1` | Warm the cache with the demo artists at startup. |
 
 **LLM providers.** OpenRouter is the default. Nebius Token Factory is the
@@ -166,6 +167,9 @@ injects `PORT`, which the container honours. Railway has marked
 `railway.json` (Config as Code) as deprecated in favour of Infrastructure as
 Code, with existing files supported until 2026-12-01; the Dockerfile alone is
 enough for Railway to build, so nothing breaks if you drop the JSON.
+On Railway also set `FORWARDED_ALLOW_IPS=*` (the container is only reachable
+through Railway's proxy); without it every visitor shares the proxy's IP and
+the per-IP plan limit becomes a global one.
 
 **Render (fallback).** `render.yaml` defines a free Docker web service with the
 same healthcheck; secrets are marked `sync: false` so you enter them in the
