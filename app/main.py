@@ -109,7 +109,17 @@ class RateLimiter:
         if len(q) >= self.limit:
             return False
         q.append(now)
+        self._evict(now)
         return True
+
+    def _evict(self, now: float) -> None:
+        # Drop clients whose whole window has expired so the dict does not grow
+        # forever on a public demo. Amortised: only sweep when it has grown.
+        if len(self.hits) < 1024:
+            return
+        stale = [k for k, q in self.hits.items() if not q or now - q[-1] > self.window_s]
+        for k in stale:
+            del self.hits[k]
 
 
 class Runtime:
@@ -240,7 +250,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except Exception as exc:
             span.end(error=str(exc))
             log.exception("plan failed")
-            raise HTTPException(status_code=502, detail=f"planning failed: {exc}") from exc
+            raise HTTPException(status_code=502, detail="planning failed; see server logs") from exc
         finally:
             await client.aclose()
             await audit_client.aclose()
