@@ -103,3 +103,55 @@ def test_tags():
     )
     assert [(t.tag_id, t.name, t.tag_type) for t in tags] == [("urn:tag:x", "X", "t")]
     assert parse_tags({"results": [{"tag_id": "a", "name": "A"}]})[0].tag_id == "a"
+
+
+# --- Boundary tests for coordinate parsing and field defaults.
+
+
+def test_latlon_non_numeric_strings_are_rejected():
+    assert parse_latlon({"lat": "north", "lon": "2.5"}) is None
+    assert parse_latlon({"lat": "1.5", "lon": "2.5"}) == (1.5, 2.5)
+    assert parse_latlon({"lat": True, "lon": 2.5}) is None
+
+
+def test_latlon_inclusive_bounds_are_kept():
+    assert parse_latlon({"lat": 90, "lon": 180}) == (90.0, 180.0)
+    assert parse_latlon({"lat": -90, "lon": -180}) == (-90.0, -180.0)
+    assert parse_latlon({"lat": 45, "lon": 90}) == (45.0, 90.0)
+
+
+def test_latlon_swapped_pair_is_repaired_only_when_unambiguous():
+    # lat out of range but lon would be a valid latitude -> swap.
+    assert parse_latlon({"lat": 121.0, "lon": 14.6}) == (14.6, 121.0)
+    assert parse_latlon({"lat": 180.0, "lon": 90.0}) == (90.0, 180.0)
+    # Neither ordering is valid -> rejected, not swapped into garbage.
+    assert parse_latlon({"lat": 121.0, "lon": 95.0}) is None
+    assert parse_latlon({"lat": 45.0, "lon": 181.0}) is None
+
+
+def test_entity_optional_fields_default_to_empty_strings():
+    entity = parse_entity({"entity_id": "e1", "name": "Venue", "subtype": None})
+    assert entity is not None
+    assert entity.subtype == ""
+    assert entity.disambiguation == ""
+    entity = parse_entity(
+        {
+            "entity_id": "e2",
+            "name": "Venue",
+            "subtype": "urn:entity:place",
+            "disambiguation": "Seattle",
+        }
+    )
+    assert entity.subtype == "urn:entity:place"
+    assert entity.disambiguation == "Seattle"
+
+
+def test_heatmap_missing_affinity_defaults_to_zero_and_name_falls_back():
+    points = parse_heatmap(
+        {"results": {"heatmap": [{"location": {"lat": 1, "lon": 2, "name": "Loc"}, "query": {}}]}}
+    )
+    assert len(points) == 1
+    assert points[0].affinity == 0.0
+    assert points[0].affinity_rank == 0.0
+    assert points[0].popularity == 0.0
+    assert points[0].name == "Loc"
