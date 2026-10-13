@@ -161,7 +161,7 @@ async def run_baseline(
                 {"role": "user", "content": _request_payload(req, region)},
             ],
             None,
-            max_tokens=900,
+            max_tokens=1400,
         )
     except LLMError as exc:
         child.end(error=str(exc))

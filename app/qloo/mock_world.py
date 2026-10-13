@@ -204,7 +204,7 @@ ARTISTS: tuple[MockArtist, ...] = (
     A("Beach House", vec(dreampop=.95, indie=.6, electronic=.3), .84, disambiguation="Dream pop duo"),
     A("Waxahatchee", vec(folk=.8, country=.6, indie=.6), .7, disambiguation="Singer-songwriter"),
     A("Thundercat", vec(jazz=.8, psychsoul=.8, electronic=.4, hiphop=.4), .8, disambiguation="Bassist"),
-    A("Ben&Ben", vec(folk=.85, indie=.6, dreampop=.3), .78, disambiguation="Filipino folk-pop band"),
+    A("Up Dharma Down", vec(folk=.85, indie=.6, dreampop=.3), .78, disambiguation="Filipino folk-pop band"),
     A("IV of Spades", vec(psychsoul=.8, indie=.7, jazz=.3), .7, disambiguation="Filipino funk-rock band"),
     A("Unique Salonga", vec(indie=.8, psychsoul=.5, folk=.5), .6, disambiguation="Filipino singer-songwriter"),
 )

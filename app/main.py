@@ -54,8 +54,8 @@ DEMO_PRESETS = [
         "band_size": 3,
     },
     {
-        "label": "OPM folk-pop · Luzon",
-        "artists": ["Ben&Ben"],
+        "label": "OPM alt-soul · Luzon",
+        "artists": ["Up Dharma Down"],
         "home_region": "Luzon, Philippines",
         "tour_days": 7,
         "budget_usd": 3000,
