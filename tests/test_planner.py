@@ -186,3 +186,13 @@ def test_defaults_band_of_three_and_start_in_sixty_days():
     route = planner.plan_route(HOME, "Portland", [SEATTLE], 5, 5000)
     assert route.days[0].date == (date.today() + timedelta(days=60)).isoformat()
     assert route.cost.lodging == 1 * 2 * planner.LODGING_PER_ROOM  # one night, two rooms
+
+
+def test_cost_breakdown_rounds_each_line_to_cents():
+    cost = planner.CostBreakdown(fuel=10.4567, lodging=20.1234, per_diem=5.0049)
+    assert cost.to_dict() == {
+        "fuel": 10.46,
+        "lodging": 20.12,
+        "per_diem": 5.0,
+        "total": 35.59,
+    }
