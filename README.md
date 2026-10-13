@@ -13,12 +13,12 @@ Next to that plan it shows what the same LLM produces with no tools, and audits
 it against Qloo: which of its cities the audience actually favours, and whether
 its venues and openers exist at all.
 
-Built for the [Qloo Agentic Hackathon](https://qloo.devpost.com/) (deadline Oct 30, 2026). MIT licensed.
+Built for the [Qloo Agentic Hackathon](https://qloo.devpost.com/) (deadline Oct 30, 2026, 11:45pm EDT). MIT licensed.
 
-> **Status:** runs end to end today on hand-written synthetic fixtures
-> (`QLOO_MOCK=1`) and a scripted stand-in LLM. Plug in a Qloo hackathon key
-> and any OpenAI-compatible LLM key to go live. See
-> [docs/QLOO_VERIFY.md](docs/QLOO_VERIFY.md) for what to confirm on day one.
+> **Live demo:** https://roadie-zx1q.onrender.com (free Render instance: the first request after idle takes about a minute to wake).
+> Runs on the live Qloo hackathon API with Groq `openai/gpt-oss-120b`. Without keys it falls back to
+> synthetic fixtures (`QLOO_MOCK=1`) and a scripted stand-in LLM. See
+> [docs/QLOO_VERIFY.md](docs/QLOO_VERIFY.md).
 
 ---
 
