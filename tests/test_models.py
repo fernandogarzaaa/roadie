@@ -155,3 +155,26 @@ def test_heatmap_missing_affinity_defaults_to_zero_and_name_falls_back():
     assert points[0].affinity_rank == 0.0
     assert points[0].popularity == 0.0
     assert points[0].name == "Loc"
+
+
+def test_latlon_exact_latitude_limit_is_not_swapped():
+    assert parse_latlon({"lat": 90, "lon": 45}) == (90.0, 45.0)
+    assert parse_latlon({"lat": 90.5, "lon": 45}) == (45.0, 90.5)
+
+
+def test_latlon_just_outside_limits_is_rejected():
+    assert parse_latlon({"lat": 90.5, "lon": 95}) is None
+    assert parse_latlon({"lat": 45, "lon": 180.5}) is None
+
+
+def test_entity_to_dict_caps_tags_at_six():
+    entity = parse_entity(
+        {
+            "entity_id": "e3",
+            "name": "Venue",
+            "tags": [{"tag_id": f"t{i}", "name": f"tag {i}"} for i in range(8)],
+        }
+    )
+    assert entity is not None
+    assert len(entity.tags) == 8
+    assert len(entity.to_dict()["tags"]) == 6

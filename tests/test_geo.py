@@ -98,3 +98,9 @@ def test_region_centres_cover_their_alias_cities(city, lat, lon):
     region = resolve_region(city)
     assert haversine_km(region.lat, region.lon, lat, lon) <= region.radius_km
     assert haversine_km(region.lat, region.lon, lat, lon) < 300
+
+
+def test_three_letter_alias_is_not_matched_inside_a_phrase():
+    assert resolve_region("pnw").key == "pnw"
+    with pytest.raises(ValueError):
+        resolve_region("somewhere near pnw maybe")
